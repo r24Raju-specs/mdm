@@ -1,84 +1,33 @@
-i = 2
-j = 1
+import numpy as np
+import matplotlib.pyplot as plt
+
+i, j, R = 2, 1, 2
 
 N = i*i + i*j + j*j
-print("Cluster Size =", N)
-
-R = 2
 D = np.sqrt(3*N) * R
-print("Calculated minimum safe reuse distance (D):", round(D, 2))
 
-tower_A = np.array([0, 0])
+print("Cluster Size =", N)
+print("Reuse Distance =", round(D, 2))
 
-tower_B = np.array([
-    i*np.sqrt(3)*R + j*np.sqrt(3)*R*0.5,
-    j*3*R/2
-])
+A = np.array([0, 0])
+B = np.array([i*3**0.5*R + j*3**0.5*R/2, j*3*R/2])
+C = np.array([-j*3*R/2, i*3**0.5*R + j*3**0.5*R/2])
 
-tower_C = np.array([
-    -j*3*R/2,
-    i*np.sqrt(3)*R + j*np.sqrt(3)*R*0.5
-])
+towers = [A, B, C]
 
+for idx, (x, y) in enumerate(towers):
+    hx = [x-R*0.866, x, x+R*0.866, x+R*0.866, x, x-R*0.866, x-R*0.866]
+    hy = [y+R/2, y+R, y+R/2, y-R/2, y-R, y-R/2, y+R/2]
 
-towers = [tower_A, tower_B, tower_C]
+    plt.fill(hx, hy, color="lightgrey", edgecolor="black")
+    plt.text(x, y, f"Tower {idx+1}", ha="center")
 
-def draw_hexa(x, y, r):
-    hx = [
-        x-r*0.866, x, x+r*0.866,
-        x+r*0.866, x, x-r*0.866,
-        x-r*0.866
-    ]
+plt.plot([A[0], B[0]], [A[1], B[1]], "b--", label=f"D={D:.2f}")
+plt.plot([A[0], C[0]], [A[1], C[1]], "g--")
 
-    hy = [
-        y+r*0.5, y+r, y+r*0.5,
-        y-r*0.5, y-r, y-r*0.5,
-        y+r*0.5
-    ]
-
-    plt.fill(
-        hx, hy,
-        color="lightgrey",
-        edgecolor="black",
-        linewidth=1.5
-    )
-
-
-for idx, tower in enumerate(towers):
-    draw_hexa(tower[0], tower[1], R)
-
-    plt.text(
-        tower[0], tower[1],
-        f"Tower {idx+1}",
-        ha="center",
-        va="center",
-        fontsize=10
-    )
-
-
-plt.plot(
-    [tower_A[0], tower_B[0]],
-    [tower_A[1], tower_B[1]],
-    "b--",
-    linewidth=1.5,
-    label=f"D = {D:.2f}"
-)
-
-plt.plot(
-    [tower_A[0], tower_C[0]],
-    [tower_A[1], tower_C[1]],
-    "g--",
-    linewidth=2
-)
-
-plt.scatter(
-    [tower_A[0], tower_B[0], tower_C[0]],
-    [tower_A[1], tower_B[1], tower_C[1]],
-    color="red"
-)
-
-plt.title(f"Hexagonal Frequency Reuse (N = {N})")
+plt.scatter([A[0], B[0], C[0]], [A[1], B[1], C[1]], color="red")
+plt.title(f"Hexagonal Frequency Reuse (N={N})")
 plt.axis("equal")
-plt.grid(True)
+plt.grid()
 plt.legend()
 plt.show()
